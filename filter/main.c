@@ -86,13 +86,16 @@ main()
 	}
 	line[lenr - 1] = '\0';
 
-	if ((isbody == 0) && (strlen(line) == 0))
+	if ((isbody == 0) && (lenr == 1)) {
+	    if (currlvl != 3)
+		goto notmatched;
 	    isbody = 1;
+	}
 
 	switch(currlvl) {
 	case 0:
 	    matched = regexec(&mid_rex, line, 2, matches, 0);
-	    if ((matched == 0) && (isbody == 0)) {
+	    if (matched == 0) {
 		msgid = strdup(get_matched_str(line, matches, 1));
 		currlvl++;
 	    }
@@ -100,7 +103,7 @@ main()
 
 	case 1:
 	    matched = regexec(&brnch_rex, line, 2, matches, 0);
-	    if ((matched == 0) && (isbody == 0)) {
+	    if (matched == 0) {
 		branch = strdup(get_matched_str(line, matches, 1));
 		if (strcmp(branch, "HEAD") != 0)
 		    goto notmatched;
@@ -110,7 +113,7 @@ main()
 
 	case 2:
 	    matched = regexec(&sender_rex, line, 2, matches, 0);
-	    if ((matched == 0) && (isbody == 0)) {
+	    if (matched == 0) {
 		sender = strdup(get_matched_str(line, matches, 1));
 		if ((strcasecmp(sender, "owner-cvs-all@FreeBSD.ORG") != 0) &&
 		    (strcasecmp(sender, "owner-cvs-committers@FreeBSD.org") != 0))
