@@ -40,7 +40,7 @@ char	*get_matched_str(char *, regmatch_t [], int);
 int
 main()
 {
-    FILE *tmpfile;
+    FILE *tempfile;
     int fd, matched, currlvl;
     char *branch, *line, *mfc_per, *msgid, *outname, *sender, *tmp;
     char tmpname[] = MFCNS_TMP "/.MFCns.XXXXXX";
@@ -55,8 +55,8 @@ main()
 	/* Not Reached */
     }
 
-    tmpfile = fdopen(fd, "w");
-    if (tmpfile == NULL) {
+    tempfile = fdopen(fd, "w");
+    if (tempfile == NULL) {
         err(2, "%s", tmpname);
         /* Not Reached */
     }
@@ -72,7 +72,7 @@ main()
     mfc_per = NULL;
     currlvl = 0;
     while((line = fgetln(stdin, &lenr)) != NULL) {
-        lenw = fwrite(line, 1, lenr, tmpfile);
+        lenw = fwrite(line, 1, lenr, tempfile);
         if (lenw != lenr) {
             warn("%s", tmpname);
             unlink(tmpname);
@@ -128,7 +128,7 @@ main()
 	}
     }
 
-    fclose(tmpfile);
+    fclose(tempfile);
 
     if (currlvl < 4 || msgid == NULL || branch == NULL || mfc_per == NULL)
 	goto notmatched;
