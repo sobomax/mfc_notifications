@@ -3,12 +3,6 @@ o Add a distinct marker between "preamble" and the copy of the original
   automatic scripts (such as cvsmerge) easier. Requested by Garance A Drosihn
   <drosih@rpi.edu>.
 
-o Ensure that the notifications are being sent in the same order as the
-  commits, i.e. if the person does several sequental commits to the same
-  file and specifies exactly the same "MFC after" interval he should receive
-  notifications in the right order (FIFO). Seemingly current behaviour is
-  opposite - LIFO. Reported by Rober Watson <rwarson@FreeBSD.org>.
-
 o Provide better granularity for sending notifications. Currently granularity
   is 1 day, so that if the person did a commit a hour before "time X" when
   the handler is sheduled to run, and specified "MFC after: 1 day" then he
