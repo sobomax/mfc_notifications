@@ -1,6 +1,7 @@
 # $FreeBSD$
 
 SCRIPTS=	MFCns_handler.py
+SCRIPTSNAME=	${SCRIPTS}
 
 SCRIPTSDIR=	${MFCNSBINDIR}
 
