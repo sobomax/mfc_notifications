@@ -3,11 +3,11 @@
 PROG=		MFCns_filter
 
 SRCS=		main.c
-BINDIR=		/home/sobomax/bin
+BINDIR=		${MFCNSBINDIR}
 
 MAN1=
 
-BINOWN=		sobomax
-BINGRP=		sobomax
+BINOWN=		${MFCNSOWN}
+BINGRP=		${MFCNSGRP}
 
 .include <bsd.prog.mk>
