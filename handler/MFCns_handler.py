@@ -33,11 +33,12 @@ MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>
 MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
 SECSADAY = 24*60*60
 
-def sendnote(to, subject, content):
+def sendnote(to, subject, branch, content):
     template = map(lambda str: str + '\n', \
         ('From: MFC Notification Service <mfc-notifications@FreeBSD.org>',    \
          'To: %s <%s>' % to,                            \
          'Subject: Pending MFC Reminder [%s]' % subject,            \
+         'X-FreeBSD-CVS-Branch: %s' % branch, \
          '',                                    \
          'Dear %s,' % to[0],                            \
          '',                                    \
@@ -169,6 +170,7 @@ def main():
             message = rfc822.Message(file)
             to = message.getaddr('From')
             subject = message.getheader('Subject')
+            branch = message.getheader('X-FreeBSD-CVS-Branch')
             message.rewindbody()
             content = file.readlines()
             file.close
@@ -181,7 +183,7 @@ def main():
                     break
                 i += 1
 
-            sendnote(to, subject, content)
+            sendnote(to, subject, branch, content)
             lprintf('MFC notification sent to "%s" <%s>', to)
             os.unlink(filename)
 
