@@ -1,3 +1,9 @@
+o Extend the notification message with the branch the original commit was for
+  as well as add a distinct marker between "preamble" and the copy of the
+  original commit message. This should make parsing of the notification
+  message by automatic scripts (such as cvsmerge) easier. Requested by
+  Garance A Drosihn <drosih@rpi.edu>.
+
 o Ensure that the notifications are being sent in the same order as the
   commits, i.e. if the person does several sequental commits to the same
   file and specifies exactly the same "MFC after" interval he should receive
