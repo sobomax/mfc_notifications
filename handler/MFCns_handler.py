@@ -14,7 +14,7 @@ MFCNG_TMP = os.path.join(MFCNG_ROOT, 'tmp')
 MFCNG_SPOOL = os.path.join(MFCNG_ROOT, 'spool')
 MFCNG_QUEUE = os.path.join(MFCNG_ROOT, 'queue')
 MFCNG_LOGFILE = os.path.join(MFCNG_ROOT, 'log/MFCns.log')
-MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?)?[ \t]*$'
+MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?|months?)?[ \t]*$'
 MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
 SECSADAY = 24*60*60
 MAILCMD = '/usr/sbin/sendmail'
@@ -109,6 +109,8 @@ for filename in os.listdir(MFCNG_SPOOL):
 		mfc_in = int(result.group('ndays'))
 		if result.group('measr')[0:4] == 'week':
 			mfc_in *= 7
+		elif result.group('measr')[0:5] == 'month':
+			mfc_in *= 30
 	if mfc_in <= 0:
 		lprintf('%s: doesn\'t look like a MFC notification request', filename)
 		continue
