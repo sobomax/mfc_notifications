@@ -31,6 +31,7 @@ MFCNS_QUEUE = os.path.join(MFCNS_ROOT, 'queue')
 MFCNS_LOGFILE = os.path.join(MFCNS_ROOT, 'log/MFCns.log')
 MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?|months?)?[ \t]*$'
 MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
+SAFEADDR_PTRN = '^[a-zA-Z0-9_\\-.]+@freebsd.org$'
 SECSADAY = 24*60*60
 
 def sendnote(to, subject, content):
@@ -154,6 +155,7 @@ def main():
     cdate = time.localtime(timestamp)
     today = int('%d%02d%02d' % tuple(cdate[0:3]))
     mfc_tral_rex = re.compile(MFC_TRAL)
+    safeaddr_rex = re.compile(SAFEADDR_PTRN)
 
     for dir in os.listdir(MFCNS_QUEUE):
         fdir = os.path.join(MFCNS_QUEUE, dir)
@@ -169,6 +171,10 @@ def main():
             file = open(filename, 'r')
             message = rfc822.Message(file)
             to = message.getaddr('From')
+            # Be paranoidal about what's allowed as an address
+            if safeaddr_rex.match(to[1].lower()) == None:
+                lprintf('%s: invalid address', to[1])
+                continue
             subject = message.getheader('Subject')
             message.rewindbody()
             content = file.readlines()
