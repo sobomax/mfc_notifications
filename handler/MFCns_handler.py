@@ -33,6 +33,9 @@ MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>
 MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
 SECSADAY = 24*60*60
 
+# Pause between sending notifications
+SENDBREAK = 10
+
 def sendnote(to, subject, branch, content):
     template = map(lambda str: str + '\n', \
         ('From: MFC Notification Service <mfc-notifications@FreeBSD.org>',    \
@@ -154,6 +157,7 @@ def main():
     cdate = time.localtime(timestamp)
     today = int('%d%02d%02d' % tuple(cdate[0:3]))
     mfc_tral_rex = re.compile(MFC_TRAL)
+    do_sleep = 0
 
     for dir in os.listdir(MFCNS_QUEUE):
         fdir = os.path.join(MFCNS_QUEUE, dir)
@@ -161,6 +165,8 @@ def main():
             continue
 
         for filename in os.listdir(fdir):
+            if do_sleep == 1:
+                time.sleep(SENDBREAK)
             filename = os.path.join(fdir, filename)
             if not os.path.isfile(filename):
                 lprintf('%s: not a file found in the queue directory', filename)
@@ -186,6 +192,7 @@ def main():
             sendnote(to, subject, branch, content)
             lprintf('MFC notification sent to "%s" <%s>', to)
             os.unlink(filename)
+            do_sleep = 1
 
         if len(os.listdir(fdir)) == 0:
             os.rmdir(fdir)
