@@ -1,4 +1,17 @@
 #!/usr/local/bin/python
+#
+# ---------------------------------------------------------------------------
+# "THE BEER-WARE LICENSE" (Revision 42, (c) Poul-Henning Kamp): Maxim
+# Sobolev <sobomax@FreeBSD.org> wrote this file. As long as you retain
+# this  notice you can  do whatever you  want with this stuff. If we meet
+# some day, and you think this stuff is worth it, you can buy me a beer in
+# return.
+#
+# Maxim Sobolev
+# ---------------------------------------------------------------------------
+#
+# $FreeBSD$
+#
 
 import atexit, os, rfc822, re, time, errno, tempfile, types, socket, popen2
 from pty import STDOUT_FILENO, STDERR_FILENO
@@ -110,9 +123,9 @@ for filename in os.listdir(MFCNG_SPOOL):
 		measure = result.group('measr')
 		if measure == None:
 			pass
-		elif measure == 'week':
+		elif measure[0:4] == 'week':
 			mfc_in *= 7
-		elif measure == 'month':
+		elif measure[0:5] == 'month':
 			mfc_in *= 30
 	if mfc_in <= 0:
 		lprintf('%s: doesn\'t look like a MFC notification request', filename)
