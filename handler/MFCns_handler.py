@@ -17,16 +17,16 @@ import atexit, os, rfc822, re, time, errno, tempfile, types, socket, popen2
 from pty import STDOUT_FILENO, STDERR_FILENO
 
 
-MFCNG_ROOT = '/home/sobomax/MFCns'
+MFCNS_ROOT = '/home/sobomax/MFCns'
 
 # XXX (for debugging purposes)
 if  socket.gethostname() == 'notebook':
-	MFCNG_ROOT = '/tmp/MFCns'
+	MFCNS_ROOT = '/tmp/MFCns'
 
-MFCNG_TMP = os.path.join(MFCNG_ROOT, 'tmp')
-MFCNG_SPOOL = os.path.join(MFCNG_ROOT, 'spool')
-MFCNG_QUEUE = os.path.join(MFCNG_ROOT, 'queue')
-MFCNG_LOGFILE = os.path.join(MFCNG_ROOT, 'log/MFCns.log')
+MFCNS_TMP = os.path.join(MFCNS_ROOT, 'tmp')
+MFCNS_SPOOL = os.path.join(MFCNS_ROOT, 'spool')
+MFCNS_QUEUE = os.path.join(MFCNS_ROOT, 'queue')
+MFCNS_LOGFILE = os.path.join(MFCNS_ROOT, 'log/MFCns.log')
 MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?|months?)?[ \t]*$'
 MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
 SECSADAY = 24*60*60
@@ -87,7 +87,7 @@ def lprintf(format, args = ''):
 
 # Part 0. Prepare environment
 
-log = open(MFCNG_LOGFILE, 'a')
+log = open(MFCNS_LOGFILE, 'a')
 logfd = log.fileno()
 os.dup2(logfd, STDOUT_FILENO)
 os.dup2(logfd, STDERR_FILENO)
@@ -99,8 +99,8 @@ atexit.register(cleanup)
 
 mfc_rex = re.compile(MFC_PTRN)
 
-for filename in os.listdir(MFCNG_SPOOL):
-	filename = os.path.join(MFCNG_SPOOL, filename)
+for filename in os.listdir(MFCNS_SPOOL):
+	filename = os.path.join(MFCNS_SPOOL, filename)
 	if not os.path.isfile(filename):
 		lprintf('%s: not a file found in the spool directory', filename)
 		continue
@@ -137,7 +137,7 @@ for filename in os.listdir(MFCNG_SPOOL):
 	date = time.localtime(timestamp)
 	strdate = '%d%02d%02d' % tuple(date[0:3])
 
-	destdir = os.path.join(MFCNG_QUEUE, strdate)
+	destdir = os.path.join(MFCNS_QUEUE, strdate)
 	if not os.path.exists(destdir):
 		os.mkdir(destdir)
 	if not os.path.isdir(destdir):
@@ -153,8 +153,8 @@ cdate = time.localtime(timestamp)
 today = int('%d%02d%02d' % tuple(cdate[0:3]))
 mfc_tral_rex = re.compile(MFC_TRAL)
 
-for dir in os.listdir(MFCNG_QUEUE):
-	fdir = os.path.join(MFCNG_QUEUE, dir)
+for dir in os.listdir(MFCNS_QUEUE):
+	fdir = os.path.join(MFCNS_QUEUE, dir)
 	if not (os.path.isdir(fdir) and len(dir) == 8 and int(dir) <= today):
 		continue
 

@@ -22,12 +22,12 @@
 #include <regex.h>
 
 #ifdef _HOME
-#define MFCNG_ROOT	"/tmp/MFCns"
+#define MFCNS_ROOT	"/tmp/MFCns"
 #else
-#define MFCNG_ROOT	"/home/sobomax/MFCns"
+#define MFCNS_ROOT	"/home/sobomax/MFCns"
 #endif
-#define MFCNG_TMP	MFCNG_ROOT "/tmp"
-#define MFCNG_SPOOL	MFCNG_ROOT "/spool"
+#define MFCNS_TMP	MFCNS_ROOT "/tmp"
+#define MFCNS_SPOOL	MFCNS_ROOT "/spool"
 
 #define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@freefall\\.freebsd\\.org)>$"
 #define BRNCH_PTRN	"^X-FreeBSD-CVS-Branch: ([A-Z_0-9]+)$"
@@ -42,7 +42,7 @@ main()
     FILE *tmpfile;
     int fd, matched, currlvl;
     char *branch, *line, *mfc_per, *msgid, *outname, *tmp;
-    char tmpname[] = MFCNG_TMP "/.MFCns.XXXXXX";
+    char tmpname[] = MFCNS_TMP "/.MFCns.XXXXXX";
     regex_t brnch_rex, mfc_rex, mid_rex;
     regmatch_t matches[2];
     size_t lenr, lenw;
@@ -125,7 +125,7 @@ main()
 	/* Not Reached */
     }
 
-    asprintf(&outname, "%s/%s", MFCNG_SPOOL, msgid);
+    asprintf(&outname, "%s/%s", MFCNS_SPOOL, msgid);
 
     if (rename(tmpname, outname) != 0) {
         err(2, "rename %s to %s", tmpname, outname);
