@@ -116,7 +116,8 @@ main()
 	    if (matched == 0) {
 		sender = strdup(get_matched_str(line, matches, 1));
 		if ((strcasecmp(sender, "owner-cvs-all@FreeBSD.ORG") != 0) &&
-		    (strcasecmp(sender, "owner-cvs-committers@FreeBSD.org") != 0))
+		    (strcasecmp(sender, "owner-cvs-committers@FreeBSD.org") != 0) &&
+		    (strcasecmp(sender, "owner-src-committers@FreeBSD.org") != 0))
 		    goto notmatched;
 		currlvl++;
 	    }
