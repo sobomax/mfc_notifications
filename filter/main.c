@@ -57,8 +57,8 @@ main()
 
     tempfile = fdopen(fd, "w");
     if (tempfile == NULL) {
-        err(2, "%s", tmpname);
-        /* Not Reached */
+	err(2, "%s", tmpname);
+	/* Not Reached */
     }
 
     safe_regcomp(&brnch_rex, BRNCH_PTRN, REG_EXTENDED | REG_NEWLINE);
@@ -73,24 +73,24 @@ main()
     currlvl = 0;
     isbody = 0;
     while((line = fgetln(stdin, &lenr)) != NULL) {
-        lenw = fwrite(line, 1, lenr, tempfile);
-        if (lenw != lenr) {
-            warn("%s", tmpname);
-            unlink(tmpname);
-            exit(2);
-        }
+	lenw = fwrite(line, 1, lenr, tempfile);
+	if (lenw != lenr) {
+	    warn("%s", tmpname);
+	    unlink(tmpname);
+	    exit(2);
+	}
 
-        if (line[lenr - 1] != '\n') {
-            tmp = alloca(++lenr);
-            line = memcpy(tmp, line, lenr - 1);
-        }
-        line[lenr - 1] = '\0';
+	if (line[lenr - 1] != '\n') {
+	    tmp = alloca(++lenr);
+	    line = memcpy(tmp, line, lenr - 1);
+	}
+	line[lenr - 1] = '\0';
 
 	if ((isbody == 0) && (strlen(line) == 0))
 	    isbody = 1;
 
-        switch(currlvl) {
-        case 0:
+	switch(currlvl) {
+	case 0:
 	    matched = regexec(&mid_rex, line, 2, matches, 0);
 	    if ((matched == 0) && (isbody == 0)) {
 		msgid = strdup(get_matched_str(line, matches, 1));
@@ -122,8 +122,8 @@ main()
 	case 3:
 	    matched = regexec(&mfc_rex, line, 2, matches, 0);
 	    if (matched == 0) {
-	        mfc_per = strdup(get_matched_str(line, matches, 1));
-	        currlvl++;
+		mfc_per = strdup(get_matched_str(line, matches, 1));
+		currlvl++;
 	    }
 	    break;
 
@@ -140,8 +140,8 @@ main()
     asprintf(&outname, "%s/%s", MFCNS_SPOOL, msgid);
 
     if (rename(tmpname, outname) != 0) {
-        err(2, "rename %s to %s", tmpname, outname);
-        /* Not Reached */
+	err(2, "rename %s to %s", tmpname, outname);
+	/* Not Reached */
     }
 
     exit(0);
@@ -159,10 +159,10 @@ safe_regcomp(regex_t *preg, const char *pattern, int cflags)
 
     rval = regcomp(preg, pattern, cflags);
     if (rval != 0) {
-        errbuf[0] = '\0';
-        regerror(rval, preg, errbuf, sizeof(errbuf));
-        errx(2, "can't compile regular expression: %s", errbuf);
-        /* Not Reached */
+	errbuf[0] = '\0';
+	regerror(rval, preg, errbuf, sizeof(errbuf));
+	errx(2, "can't compile regular expression: %s", errbuf);
+	/* Not Reached */
     }
 
     return rval;
@@ -177,9 +177,9 @@ get_matched_str(char *pattern, regmatch_t pmatch[], int matchn)
     len = pmatch[matchn].rm_eo - pmatch[matchn].rm_so + 1;
 
     if (rval == NULL)
-        rval = malloc(len);
+	rval = malloc(len);
     else
-        rval = realloc(rval, len);
+	rval = realloc(rval, len);
 
     strlcpy(rval, pattern + pmatch[matchn].rm_so, len);
 
