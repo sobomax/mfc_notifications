@@ -1,15 +1,21 @@
 #!/usr/local/bin/python
 
-import atexit, os, rfc822, re, time, errno, tempfile, types
+import atexit, os, rfc822, re, time, errno, tempfile, types, socket
 from pty import STDOUT_FILENO, STDERR_FILENO
 
-#MFCNG_ROOT = '/tmp/MFCns'
+
 MFCNG_ROOT = '/home/sobomax/MFCns'
+
+# XXX (for debugging purposes)
+if  socket.gethostname() == 'notebook':
+	MFCNG_ROOT = '/tmp/MFCns'
+
 MFCNG_TMP = os.path.join(MFCNG_ROOT, 'tmp')
 MFCNG_SPOOL = os.path.join(MFCNG_ROOT, 'spool')
 MFCNG_QUEUE = os.path.join(MFCNG_ROOT, 'queue')
 MFCNG_LOGFILE = os.path.join(MFCNG_ROOT, 'log/MFCns.log')
 MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?)?[ \t]*$'
+MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
 SECSADAY = 24*60*60
 MAILCMD = '/usr/sbin/sendmail'
 
@@ -66,6 +72,8 @@ def lprintf(format, args = ''):
 			args = []
 	elif type(args) == types.TupleType:
 		args = list(args)
+	elif type(args) in (types.IntType, types.LongType, types.FloatType):
+		args = [args]
 	args.insert(0, stime())
 	args = tuple(args)
 	print format % args
@@ -132,6 +140,7 @@ for filename in os.listdir(MFCNG_SPOOL):
 timestamp = time.time()
 cdate = time.localtime(timestamp)
 today = int('%d%02d%02d' % tuple(cdate[0:3]))
+mfc_tral_rex = re.compile(MFC_TRAL)
 
 for dir in os.listdir(MFCNG_QUEUE):
 	fdir = os.path.join(MFCNG_QUEUE, dir)
@@ -151,6 +160,15 @@ for dir in os.listdir(MFCNG_QUEUE):
 		message.rewindbody()
 		content = file.readlines()
 		file.close
+
+		i = 0
+		for line in content:
+			result = mfc_tral_rex.match(line)
+			if result != None:
+				content = content[:i]
+				break
+			i += 1
+
 		sendnote(to, subject, content)
 		lprintf('MFC notification sent to "%s" <%s>', to)
 		os.unlink(filename)
