@@ -11,7 +11,7 @@ MFCNG_QUEUE = os.path.join(MFCNG_ROOT, 'queue')
 MFCNG_LOGFILE = os.path.join(MFCNG_ROOT, 'log/MFCns.log')
 MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?)?[ \t]*$'
 SECSADAY = 24*60*60
-MAILCMD = '/usr/local/bin/mailsend -H'
+MAILCMD = '/usr/sbin/sendmail'
 
 
 def sendnote(to, subject, content):
@@ -20,7 +20,8 @@ def sendnote(to, subject, content):
 	file = open(tempname, 'w')
 
 	template = map(lambda str: str + '\n', \
-		('From: "Maxim Sobolev" <sobomax@FreeBSD.org>',				\
+		('From: MFC Notification Service <mfc-notifications@FreeBSD.org>',	\
+		 'To: %s <%s>' % to,							\
 		 'Subject: Pending MFC Reminder [%s]' % subject,			\
 		 '',									\
 		 'Dear %s,' % to[0],							\
@@ -69,7 +70,8 @@ def lprintf(format, args = ''):
 	args = tuple(args)
 	print format % args
 
-# Prepare environment
+
+# Part 0. Prepare environment
 
 log = open(MFCNG_LOGFILE, 'a')
 logfd = log.fileno()
@@ -77,6 +79,7 @@ os.dup2(logfd, STDOUT_FILENO)
 os.dup2(logfd, STDERR_FILENO)
 lprintf('MFCns_handler started')
 atexit.register(cleanup)
+
 
 # Part I. Spool dir processing
 
