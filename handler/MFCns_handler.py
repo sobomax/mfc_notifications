@@ -1,6 +1,6 @@
 #!/usr/local/bin/python
 
-import atexit, os, rfc822, re, time, errno, tempfile, types, socket
+import atexit, os, rfc822, re, time, errno, tempfile, types, socket, popen2
 from pty import STDOUT_FILENO, STDERR_FILENO
 
 
@@ -19,12 +19,7 @@ MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
 SECSADAY = 24*60*60
 MAILCMD = '/usr/sbin/sendmail'
 
-
 def sendnote(to, subject, content):
-	tempfile.tempdir = MFCNG_TMP
-	tempname = tempfile.mktemp()
-	file = open(tempname, 'w')
-
 	template = map(lambda str: str + '\n', \
 		('From: MFC Notification Service <mfc-notifications@FreeBSD.org>',	\
 		 'To: %s <%s>' % to,							\
@@ -46,17 +41,15 @@ def sendnote(to, subject, content):
 		 'believe that you received this message due to an error.',		\
 		 ''))
 	template.extend(content)
-	file.writelines(template)
-	file.close()
-	cmdline = '%s %s < %s' % (MAILCMD, to[1], tempname)
-	exitstat = os.system(cmdline)
-	if os.WIFEXITED(exitstat):
-		exitval = os.WEXITSTATUS(exitstat)
-		if exitval != 0:
-			os.unlink(tempname)
-			raise IOError('can\'t send a message: external command returned non-zero error code')
-	os.unlink(tempname)
 
+	cmdline = '%s %s' % (MAILCMD, to[1])
+	pipe = popen2.Popen4(cmdline)
+	pipe.tochild.writelines(template)
+	for stream in (pipe.fromchild, pipe.tochild):
+		stream.close()
+	if pipe.wait() != 0:
+		raise IOError('can\'t send a message: external command returned non-zero error code')
+	
 def stime():
 	return time.ctime(time.time())
 
