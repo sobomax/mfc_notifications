@@ -18,10 +18,12 @@ from pty import STDOUT_FILENO, STDERR_FILENO
 
 
 MFCNS_ROOT = '/home/sobomax/MFCns'
+MAILCMD = '/usr/sbin/sendmail'
 
 # XXX (for debugging purposes)
 if  socket.gethostname() == 'notebook':
 	MFCNS_ROOT = '/tmp/MFCns'
+	MAILCMD = os.path.join(MFCNS_ROOT, 'testsend')
 
 MFCNS_TMP = os.path.join(MFCNS_ROOT, 'tmp')
 MFCNS_SPOOL = os.path.join(MFCNS_ROOT, 'spool')
@@ -30,7 +32,6 @@ MFCNS_LOGFILE = os.path.join(MFCNS_ROOT, 'log/MFCns.log')
 MFC_PTRN = '^  [ \t]*MFC[ \t]+(after|in):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?|months?)?[ \t]*$'
 MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
 SECSADAY = 24*60*60
-MAILCMD = '/usr/sbin/sendmail'
 
 def sendnote(to, subject, content):
 	template = map(lambda str: str + '\n', \
@@ -114,7 +115,7 @@ for filename in os.listdir(MFCNS_SPOOL):
 	content = file.readlines()
 	file.close()
 
-	mfc_in = 0
+	mfc_in = -1
 	for line in content:
 		result = mfc_rex.match(line)
 		if result == None:
@@ -127,7 +128,7 @@ for filename in os.listdir(MFCNS_SPOOL):
 			mfc_in *= 7
 		elif measure[0:5] == 'month':
 			mfc_in *= 30
-	if mfc_in <= 0:
+	if mfc_in < 0:
 		lprintf('%s: doesn\'t look like a MFC notification request', filename)
 		continue
 
