@@ -41,7 +41,7 @@ int
 main()
 {
     FILE *tempfile;
-    int fd, matched, currlvl;
+    int fd, matched, currlvl, isbody;
     char *branch, *line, *mfc_per, *msgid, *outname, *sender, *tmp;
     char tmpname[] = MFCNS_TMP "/.MFCns.XXXXXX";
     regex_t brnch_rex, mfc_rex, mid_rex, sender_rex;
@@ -71,6 +71,7 @@ main()
     sender = NULL;
     mfc_per = NULL;
     currlvl = 0;
+    isbody = 0;
     while((line = fgetln(stdin, &lenr)) != NULL) {
         lenw = fwrite(line, 1, lenr, tempfile);
         if (lenw != lenr) {
@@ -85,10 +86,13 @@ main()
         }
         line[lenr - 1] = '\0';
 
+	if ((isbody == 0) && (strlen(line) == 0))
+	    isbody = 1;
+
         switch(currlvl) {
         case 0:
 	    matched = regexec(&mid_rex, line, 2, matches, 0);
-	    if (matched == 0) {
+	    if ((matched == 0) && (isbody == 0)) {
 		msgid = strdup(get_matched_str(line, matches, 1));
 		currlvl++;
 	    }
@@ -96,7 +100,7 @@ main()
 
 	case 1:
 	    matched = regexec(&brnch_rex, line, 2, matches, 0);
-	    if (matched == 0) {
+	    if ((matched == 0) && (isbody == 0)) {
 		branch = strdup(get_matched_str(line, matches, 1));
 		if (strcmp(branch, "HEAD") != 0)
 		    goto notmatched;
@@ -106,7 +110,7 @@ main()
 
 	case 2:
 	    matched = regexec(&sender_rex, line, 2, matches, 0);
-	    if (matched == 0) {
+	    if ((matched == 0) && (isbody == 0)) {
 		sender = strdup(get_matched_str(line, matches, 1));
 		if ((strcasecmp(sender, "owner-cvs-all@FreeBSD.ORG") != 0) &&
 		    (strcasecmp(sender, "owner-cvs-committers@FreeBSD.org") != 0))
