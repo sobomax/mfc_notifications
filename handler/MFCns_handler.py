@@ -107,9 +107,12 @@ for filename in os.listdir(MFCNG_SPOOL):
 		if result == None:
 			continue
 		mfc_in = int(result.group('ndays'))
-		if result.group('measr')[0:4] == 'week':
+		measure = result.group('measr')
+		if measure == None:
+			pass
+		elif measure == 'week':
 			mfc_in *= 7
-		elif result.group('measr')[0:5] == 'month':
+		elif measure == 'month':
 			mfc_in *= 30
 	if mfc_in <= 0:
 		lprintf('%s: doesn\'t look like a MFC notification request', filename)
