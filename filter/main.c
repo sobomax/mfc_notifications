@@ -31,6 +31,7 @@
 
 #define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@freefall\\.freebsd\\.org)>$"
 #define BRNCH_PTRN	"^X-FreeBSD-CVS-Branch: ([A-Z_0-9]+)$"
+#define SENDER_PTRN	"^Sender: (.*)$"
 #define MFC_PTRN	"^  [ \t]*MFC[ \t]+(after|in):[ \t]*([0-9]+)[ \t]*(days?|weeks?|months?)?[ \t]*$"
 
 int	safe_regcomp(regex_t *, const char *, int);
@@ -41,12 +42,13 @@ main()
 {
     FILE *tmpfile;
     int fd, matched, currlvl;
-    char *branch, *line, *mfc_per, *msgid, *outname, *tmp;
+    char *branch, *line, *mfc_per, *msgid, *outname, *sender, *tmp;
     char tmpname[] = MFCNS_TMP "/.MFCns.XXXXXX";
-    regex_t brnch_rex, mfc_rex, mid_rex;
+    regex_t brnch_rex, mfc_rex, mid_rex, sender_rex;
     regmatch_t matches[2];
     size_t lenr, lenw;
 
+    /*{static int b=1; while (b);}*/
     fd = mkstemp(tmpname);
     if (fd < 0) {
 	err(2, "%s", tmpname);
@@ -62,9 +64,11 @@ main()
     safe_regcomp(&brnch_rex, BRNCH_PTRN, REG_EXTENDED | REG_NEWLINE);
     safe_regcomp(&mfc_rex, MFC_PTRN, REG_EXTENDED | REG_NEWLINE);
     safe_regcomp(&mid_rex, MID_PTRN, REG_EXTENDED | REG_NEWLINE);
+    safe_regcomp(&sender_rex, SENDER_PTRN, REG_EXTENDED | REG_NEWLINE);
 
     branch = NULL;
     msgid = NULL;
+    sender = NULL;
     mfc_per = NULL;
     currlvl = 0;
     while((line = fgetln(stdin, &lenr)) != NULL) {
@@ -73,7 +77,6 @@ main()
             warn("%s", tmpname);
             unlink(tmpname);
             exit(2);
-            /* Not Reached */
         }
 
         if (line[lenr - 1] != '\n') {
@@ -95,16 +98,24 @@ main()
 	    matched = regexec(&brnch_rex, line, 2, matches, 0);
 	    if (matched == 0) {
 		branch = strdup(get_matched_str(line, matches, 1));
-		if (strcmp(branch, "HEAD") != 0) {
-		    unlink(tmpname);
-		    exit(1);
-		    /* Not Reached */
-		}
+		if (strcmp(branch, "HEAD") != 0)
+		    goto notmatched;
 		currlvl++;
 	    }
 	    break;
 
 	case 2:
+	    matched = regexec(&sender_rex, line, 2, matches, 0);
+	    if (matched == 0) {
+		sender = strdup(get_matched_str(line, matches, 1));
+		if ((strcasecmp(sender, "owner-cvs-all@FreeBSD.ORG") != 0) &&
+		    (strcasecmp(sender, "owner-cvs-committers@FreeBSD.org") != 0))
+		    goto notmatched;
+		currlvl++;
+	    }
+	    break;
+
+	case 3:
 	    matched = regexec(&mfc_rex, line, 2, matches, 0);
 	    if (matched == 0) {
 	        mfc_per = strdup(get_matched_str(line, matches, 1));
@@ -119,11 +130,8 @@ main()
 
     fclose(tmpfile);
 
-    if (currlvl < 3 || msgid == NULL || branch == NULL || mfc_per == NULL) {
-	unlink(tmpname);
-	exit(1);
-	/* Not Reached */
-    }
+    if (currlvl < 4 || msgid == NULL || branch == NULL || mfc_per == NULL)
+	goto notmatched;
 
     asprintf(&outname, "%s/%s", MFCNS_SPOOL, msgid);
 
@@ -133,6 +141,10 @@ main()
     }
 
     exit(0);
+
+notmatched:
+    unlink(tmpname);
+    exit(1);
 }
 
 int
