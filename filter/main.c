@@ -29,8 +29,8 @@
 #define MFCNS_TMP	MFCNS_ROOT "/tmp"
 #define MFCNS_SPOOL	MFCNS_ROOT "/spool"
 
-#define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@repoman\\.freebsd\\.org)>$"
-#define BRNCH_PTRN	"^X-FreeBSD-CVS-Branch: ([A-Z_0-9]+)$"
+#define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@svn\\.freebsd\\.org)>$"
+#define BRNCH_PTRN	"^X-SVN-Group: ([a-z0-9-]+)$"
 #define SENDER_PTRN	"^Sender: (.*)$"
 #define MFC_PTRN	"^  [ \t]*MFC[ \t]+([Aa]fter|[Ii]n):[ \t]*([0-9]+)[ \t]*(days?|weeks?|months?)?[ \t]*$"
 
@@ -105,7 +105,7 @@ main()
 	    matched = regexec(&brnch_rex, line, 2, matches, 0);
 	    if (matched == 0) {
 		branch = strdup(get_matched_str(line, matches, 1));
-		if (strcmp(branch, "HEAD") != 0)
+		if (strcasecmp(branch, "HEAD") != 0)
 		    goto notmatched;
 		currlvl++;
 	    }

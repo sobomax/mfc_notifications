@@ -176,7 +176,9 @@ def main():
             message = rfc822.Message(file)
             to = message.getaddr('From')
             subject = message.getheader('Subject')
-            branch = message.getheader('X-FreeBSD-CVS-Branch')
+            branch = message.getheader('X-FreeBSD-CVS-Branch', None)
+            if branch == None:
+                branch = message.getheader('X-SVN-Group')
             message.rewindbody()
             content = file.readlines()
             file.close
