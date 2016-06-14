@@ -29,7 +29,7 @@
 #define MFCNS_TMP	MFCNS_ROOT "/tmp"
 #define MFCNS_SPOOL	MFCNS_ROOT "/spool"
 
-#define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@svn\\.freebsd\\.org)>$"
+#define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@repo\\.freebsd\\.org)>$"
 #define BRNCH_PTRN	"^X-SVN-Group: ([a-z0-9-]+)$"
 #define SENDER_PTRN	"^Sender: (.*)$"
 #define MFC_PTRN	"^  [ \t]*MFC[ \t]+([Aa]fter|[Ii]n):[ \t]*([0-9]+)[ \t]*(days?|weeks?|months?)?[ \t]*$"
@@ -41,7 +41,7 @@ int
 main()
 {
     FILE *tempfile;
-    int fd, matched, currlvl, isbody;
+    int fd, currlvl, isbody;
     char *branch, *line, *mfc_per, *msgid, *outname, *sender, *tmp;
     char tmpname[] = MFCNS_TMP "/.MFCns.XXXXXX";
     regex_t brnch_rex, mfc_rex, mid_rex, sender_rex;
@@ -87,45 +87,37 @@ main()
 	line[lenr - 1] = '\0';
 
 	if ((isbody == 0) && (lenr == 1)) {
-	    if (currlvl != 3)
+	    if (currlvl != 1)
 		goto notmatched;
 	    isbody = 1;
 	}
 
 	switch(currlvl) {
 	case 0:
-	    matched = regexec(&mid_rex, line, 2, matches, 0);
-	    if (matched == 0) {
+	    /* There is no defined header order, look for all three before progressing */
+	    /* -peter */
+	    if (msgid == NULL && regexec(&mid_rex, line, 2, matches, 0) == 0) {
 		msgid = strdup(get_matched_str(line, matches, 1));
-		currlvl++;
 	    }
-	    break;
-
-	case 1:
-	    matched = regexec(&brnch_rex, line, 2, matches, 0);
-	    if (matched == 0) {
+	    if (branch == NULL && regexec(&brnch_rex, line, 2, matches, 0) == 0) {
 		branch = strdup(get_matched_str(line, matches, 1));
 		if (strcasecmp(branch, "HEAD") != 0)
 		    goto notmatched;
-		currlvl++;
 	    }
-	    break;
-
-	case 2:
-	    matched = regexec(&sender_rex, line, 2, matches, 0);
-	    if (matched == 0) {
+	    if (sender == NULL && regexec(&sender_rex, line, 2, matches, 0) == 0) {
 		sender = strdup(get_matched_str(line, matches, 1));
 		if ((strcasecmp(sender, "owner-cvs-all@FreeBSD.ORG") != 0) &&
 		    (strcasecmp(sender, "owner-cvs-committers@FreeBSD.org") != 0) &&
 		    (strcasecmp(sender, "owner-src-committers@FreeBSD.org") != 0))
 		    goto notmatched;
+	    }
+	    if (msgid != NULL && branch != NULL && sender != NULL) {
 		currlvl++;
 	    }
 	    break;
 
-	case 3:
-	    matched = regexec(&mfc_rex, line, 2, matches, 0);
-	    if (matched == 0) {
+	case 1:
+	    if (regexec(&mfc_rex, line, 2, matches, 0) == 0) {
 		mfc_per = strdup(get_matched_str(line, matches, 1));
 		currlvl++;
 	    }
@@ -138,7 +130,7 @@ main()
 
     fclose(tempfile);
 
-    if (currlvl < 4 || msgid == NULL || branch == NULL || mfc_per == NULL)
+    if (currlvl < 1 || msgid == NULL || branch == NULL || mfc_per == NULL)
 	goto notmatched;
 
     asprintf(&outname, "%s/%s", MFCNS_SPOOL, msgid);
