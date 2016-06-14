@@ -2,6 +2,8 @@
 
 PROG=		MFCns_filter
 
+NO_SHARED=
+
 SRCS=		main.c
 BINDIR=		${MFCNSBINDIR}
 
