@@ -76,8 +76,8 @@ def stime():
 def cleanup():
     lprintf('MFCns_handler finished')
 
-def lprintf(format, args = ''):
-    format = '%s: ' + format
+def lprintf(fmt, args = ''):
+    fmt = '%s: ' + fmt
     if type(args) == types.StringType:
         if len(args) > 0:
             args = [args]
@@ -89,7 +89,7 @@ def lprintf(format, args = ''):
         args = [args]
     args.insert(0, stime())
     args = tuple(args)
-    print format % args
+    print fmt % args
 
 
 def main():    
@@ -113,14 +113,14 @@ def main():
             lprintf('%s: not a file found in the spool directory', filename)
             continue
 
-        file = open(filename, 'r')
-        message = rfc822.Message(file)
+        fdes = open(filename, 'r')
+        message = rfc822.Message(fdes)
 
         date = list(message.getdate('Date'))
 
         message.rewindbody()
-        content = file.readlines()
-        file.close()
+        content = fdes.readlines()
+        fdes.close()
 
         mfc_in = -1
         for line in content:
@@ -162,9 +162,9 @@ def main():
     mfc_tral_rex = re.compile(MFC_TRAL)
     do_sleep = 0
 
-    for dir in os.listdir(MFCNS_QUEUE):
-        fdir = os.path.join(MFCNS_QUEUE, dir)
-        if not (os.path.isdir(fdir) and len(dir) == 8 and int(dir) <= today):
+    for dname in os.listdir(MFCNS_QUEUE):
+        fdir = os.path.join(MFCNS_QUEUE, dname)
+        if not (os.path.isdir(fdir) and len(dname) == 8 and int(dname) <= today):
             continue
 
         for filename in os.listdir(fdir):
@@ -175,16 +175,16 @@ def main():
                 lprintf('%s: not a file found in the queue directory', filename)
                 continue
 
-            file = open(filename, 'r')
-            message = rfc822.Message(file)
+            fdes = open(filename, 'r')
+            message = rfc822.Message(fdes)
             to = message.getaddr('From')
             subject = message.getheader('Subject')
             branch = message.getheader('X-FreeBSD-CVS-Branch', None)
             if branch == None:
                 branch = message.getheader('X-SVN-Group')
             message.rewindbody()
-            content = file.readlines()
-            file.close
+            content = fdes.readlines()
+            fdes.close()
 
             i = 0
             for line in content:
