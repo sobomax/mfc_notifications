@@ -57,6 +57,9 @@ def sendnote(to, subject, branch, content):
          'Maxim "MFC Reminder" Sobolev',                    \
          'P.S. Please contact Maxim Sobolev <sobomax@FreeBSD.org> if you',    \
          'believe that you received this message due to an error.',        \
+         'P.P.S. Source code for this service is available at:',    \
+         'https://github.com/sobomax/mfc_notifications',        \
+         'Have a feature in mind? Pull requests are always very welcome!',
          ''))
     template.extend(content)
 
