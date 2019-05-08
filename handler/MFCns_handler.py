@@ -14,7 +14,7 @@
 #
 
 import atexit, os, re, time, errno, types, socket
-from email import message_from_file
+from email import message_from_file, policy
 from email.utils import parsedate, parseaddr
 from subprocess import Popen, PIPE
 from pty import STDOUT_FILENO, STDERR_FILENO
@@ -125,13 +125,12 @@ def main():
         lprintf('Processing "%s"...', filename)
 
         fdes = open(filename, 'r', encoding = 'utf-8')
-        message = message_from_file(fdes)
+        message = message_from_file(fdes, policy = policy.default)
+        fdes.close()
 
         date = list(parsedate(message['Date']))
 
-        fdes.seek(0, 0)
-        content = fdes.readlines()
-        fdes.close()
+        content = message.get_body().get_content().splitlines()
 
         mfc_in = -1
         for line in content:
@@ -189,15 +188,14 @@ def main():
             lprintf('Processing "%s"...', filename)
 
             fdes = open(filename, 'r', encoding = 'utf-8')
-            message = message_from_file(fdes)
+            message = message_from_file(fdes, policy = policy.default)
+            fdes.close()
             to = parseaddr(message['From'])
             subject = message['Subject']
             branch = message.get('X-FreeBSD-CVS-Branch', None)
             if branch == None:
                 branch = message['X-SVN-Group']
-            fdes.seek(0, 0)
-            content = fdes.readlines()
-            fdes.close()
+            content = message.get_body().get_content().splitlines(keepends = True)
 
             i = 0
             for line in content:
