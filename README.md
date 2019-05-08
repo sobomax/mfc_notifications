@@ -1,7 +1,6 @@
 This is a MFC notification service (`MFCns') for the FreeBSD Project.
 
-
-I. Introduction
+## Introduction
 
 At the some point of FreeBSD development it became apparent that in order
 to help developers to perform timely features merge from the developent
@@ -29,8 +28,7 @@ report from user who experieces problem with the change, security advisory
 from a security officer, negative feedback from other developers and so
 on).
 
-
-II. Design
+## Design
 
 When designing the MFCns the following goals were attacked:
 
@@ -46,8 +44,7 @@ c. it should be robust enough to minimise possibility of the accidental
    already queued notifications aren't lost and will be sent once the
    operation of the service is resumed.
 
-
-III. Implementation
+## Implementation
 
 The service is implemented in two parts. First part written in C is a
 simple mail filter, which reads mail message (one a time) from the standard
@@ -88,8 +85,7 @@ Its operation consists of the following phases:
   generates outgoing message and sends it out. Once notification is sent
   the notification request is deleted from the `queue'.
 
-
-IV. Security
+## Security
 
 Since e-mail is widely known as a not very safe medium, the service was
 designed with security in mind, however no formal security audit was
@@ -102,22 +98,15 @@ meaningless, because all that an attacker could do is to make service
 sending fake MFC notifications, but he can do this even without any help
 from the service.
 
+## Obtaining the code
 
-V. Obtaining the code
+https://github.com/sobomax/mfc_notifications
 
-You can obtain the latest code from the official FreeBSD CVS repository
-(module `mfcns'). Please refer to the FreeBSD Handbook available online at
-http://www.FreeBSD.org/ for instructions. Also you can browse the code
-online at http://cvsweb.FreeBSD.org/projects/mfcns/.
-
-
-VI. Feedback
+## Feedback
 
 If you have any questions/suggestions/requests please don't hesitate to
 contact Maxim Sobolev <sobomax@FreeBSD.org>. Also, if possible, drop me a
 line if you will find this code useful somewhere outside of the FreeBSD
 Project.
 
-
 -- Maxim Sobolev <sobomax@FreeBSD.org>
-$FreeBSD$
