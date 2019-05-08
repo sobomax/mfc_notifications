@@ -13,9 +13,17 @@
 # $FreeBSD$
 #
 
-import atexit, os, rfc822, re, time, errno, types, socket, popen2
+import atexit, os, re, time, errno, types, socket
+from email import message_from_file
+from email.utils import parsedate, parseaddr
+from subprocess import Popen, PIPE
 from pty import STDOUT_FILENO, STDERR_FILENO
 
+def isstr(obj):
+    try:
+        return (isinstance(obj, basestring))
+    except NameError:
+        return (isinstance(obj, str))
 
 MFCNS_ROOT = '/home/sobomax/MFCns'
 MAILCMD = '/usr/sbin/sendmail'
@@ -37,7 +45,7 @@ SECSADAY = 24*60*60
 SENDBREAK = 10
 
 def sendnote(to, subject, branch, content):
-    template = map(lambda str: str + '\n', \
+    template = [x + '\n' for x in \
         ('From: MFC Notification Service <mfc-notifications@FreeBSD.org>',    \
          'To: %s <%s>' % to,                            \
          'Subject: Pending MFC Reminder [%s]' % subject,            \
@@ -60,12 +68,13 @@ def sendnote(to, subject, branch, content):
          'P.P.S. Source code for this service is available at:',    \
          'https://github.com/sobomax/mfc_notifications',        \
          'Have a feature in mind? Pull requests are always very welcome!',
-         ''))
+         '')]
     template.extend(content)
+    template = [x.encode('utf-8') for x in template]
 
-    pipe = popen2.Popen4((MAILCMD, to[1]))
-    pipe.tochild.writelines(template)
-    for stream in (pipe.fromchild, pipe.tochild):
+    pipe = Popen((MAILCMD, to[1]), stdout = PIPE, stdin = PIPE)
+    pipe.stdin.writelines(template)
+    for stream in (pipe.stdout, pipe.stdin):
         stream.close()
     if pipe.wait() != 0:
         raise IOError('can\'t send a message: external command returned non-zero error code')
@@ -78,18 +87,18 @@ def cleanup():
 
 def lprintf(fmt, args = ''):
     fmt = '%s: ' + fmt
-    if type(args) == types.StringType:
+    if isstr(args):
         if len(args) > 0:
             args = [args]
         else:
             args = []
-    elif type(args) == types.TupleType:
+    elif isinstance(args, tuple):
         args = list(args)
     elif type(args) in (types.IntType, types.LongType, types.FloatType):
         args = [args]
     args.insert(0, stime())
     args = tuple(args)
-    print fmt % args
+    print(fmt % args)
 
 
 def main():    
@@ -113,12 +122,14 @@ def main():
             lprintf('%s: not a file found in the spool directory', filename)
             continue
 
-        fdes = open(filename, 'r')
-        message = rfc822.Message(fdes)
+        lprintf('Processing "%s"...', filename)
 
-        date = list(message.getdate('Date'))
+        fdes = open(filename, 'r', encoding = 'utf-8')
+        message = message_from_file(fdes)
 
-        message.rewindbody()
+        date = list(parsedate(message['Date']))
+
+        fdes.seek(0, 0)
         content = fdes.readlines()
         fdes.close()
 
@@ -175,14 +186,16 @@ def main():
                 lprintf('%s: not a file found in the queue directory', filename)
                 continue
 
-            fdes = open(filename, 'r')
-            message = rfc822.Message(fdes)
-            to = message.getaddr('From')
-            subject = message.getheader('Subject')
-            branch = message.getheader('X-FreeBSD-CVS-Branch', None)
+            lprintf('Processing "%s"...', filename)
+
+            fdes = open(filename, 'r', encoding = 'utf-8')
+            message = message_from_file(fdes)
+            to = parseaddr(message['From'])
+            subject = message['Subject']
+            branch = message.get('X-FreeBSD-CVS-Branch', None)
             if branch == None:
-                branch = message.getheader('X-SVN-Group')
-            message.rewindbody()
+                branch = message['X-SVN-Group']
+            fdes.seek(0, 0)
             content = fdes.readlines()
             fdes.close()
 
