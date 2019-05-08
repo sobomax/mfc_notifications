@@ -1,4 +1,5 @@
-This is a MFC notification service (`MFCns') for the FreeBSD Project.
+# Merge Fom Current ("MFC") notification service ("MFCns") for the
+[FreeBSD Project](https://freebsd.org).
 
 ## Introduction
 
