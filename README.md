@@ -32,13 +32,13 @@ on).
 
 When designing the MFCns the following goals were attacked:
 
-a. The service should be triggered by the presence of the special field in
+1. The service should be triggered by the presence of the special field in
    the commit message;
-b. due to the fact that it will have to parse all commit messages it should
+1. due to the fact that it will have to parse all commit messages it should
    be speed-efficient during initial selection of messages, when it have
    to separate few messages which cointain that special field from a much
    larger number of those that do not;
-c. it should be robust enough to minimise possibility of the accidental
+1. it should be robust enough to minimise possibility of the accidental
    match and provide some form of resilence, so that if the service is
    halted for some reason (e.g. machine maintenance, program error etc.)
    already queued notifications aren't lost and will be sent once the
