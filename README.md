@@ -32,13 +32,13 @@ on).
 
 When designing the MFCns the following goals were attacked:
 
-a. The service should be triggered by the presence of the special field in
+1. The service should be triggered by the presence of the special field in
    the commit message;
-b. due to the fact that it will have to parse all commit messages it should
+1. due to the fact that it will have to parse all commit messages it should
    be speed-efficient during initial selection of messages, when it have
    to separate few messages which cointain that special field from a much
    larger number of those that do not;
-c. it should be robust enough to minimise possibility of the accidental
+1. it should be robust enough to minimise possibility of the accidental
    match and provide some form of resilence, so that if the service is
    halted for some reason (e.g. machine maintenance, program error etc.)
    already queued notifications aren't lost and will be sent once the
@@ -49,19 +49,19 @@ c. it should be robust enough to minimise possibility of the accidental
 The service is implemented in two parts. First part written in C is a
 simple mail filter, which reads mail message (one a time) from the standard
 input, looks for a set of patterns and if all conditions are satisfied
-writes copy of message into a specially designated `spool' folder. To avoid
+writes copy of message into a specially designated `spool` folder. To avoid
 using locks the filter initially writes message into a temporary folder and
-then moves it into a `spool' folder using rename(2) system call, which is
+then moves it into a `spool` folder using rename(2) system call, which is
 guranteed to be atomic operation. Obviously this means that both temporary
-and `spool' folders have to reside on the same filesystem, so please keep
+and `spool` folders have to reside on the same filesystem, so please keep
 this in mind if you are going to use the service elsewhere. The name of the
-file in the `spool' directory is generated using value in the "Message-ID"
+file in the `spool` directory is generated using value in the "Message-ID"
 field of the message, allowing to avoid duplicated notification if for
 some reason more than one copy of the same commit message will be received
 by the filter. Since e-mail messages is considered as an "unsafe" medium,
 the filter puts significant restrictions on the part of the "Message-ID"
 field to be used as the filename, so that it is impossible to use forged
-message to overwrite a file outside of the `spool' directory.
+message to overwrite a file outside of the `spool` directory.
 
 The second part of the service does most of the job, which includes spool
 and queue processing and sending reminders. Since this part is not
@@ -69,21 +69,21 @@ speed-critical (it only invoked once a day), it was implemented in Python.
 Its operation consists of the following phases:
 
 - spool processing. At this stage the service parses all messages in the
-  `spool' folder, identifies the date at which each notification is to be
-  delivered and moves messages into the `queue' directory. In the `queue'
+  `spool` folder, identifies the date at which each notification is to be
+  delivered and moves messages into the `queue` directory. In the `queue`
   folder messages are placed into subfolders named by the date when each
   notification is due (YYYYMMDD), so that all notifications which should be
   delivered at the same date end up in the same subfolder. Such design
   simplifies future queue processing as well as gurantees that each message
-  is parsed only twice - first time when it is moved from the `spool' to
-  `queue' to calculate the date when notification have to be sent and
+  is parsed only twice - first time when it is moved from the `spool` to
+  `queue` to calculate the date when notification have to be sent and
   second time when the service actually sends a notification to identify to
   whom send it;
-- queue processing. At this stage the service inspects the `queue'
+- queue processing. At this stage the service inspects the `queue`
   directory and identifies which notifications are ready to be sent. It
-  parses each request from the `ready' subset, identifies recepient,
+  parses each request from the `ready` subset, identifies recepient,
   generates outgoing message and sends it out. Once notification is sent
-  the notification request is deleted from the `queue'.
+  the notification request is deleted from the `queue`.
 
 ## Security
 
