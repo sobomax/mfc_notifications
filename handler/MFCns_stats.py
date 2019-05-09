@@ -37,34 +37,34 @@ def locatemax(stats):
 
 def main():
     sent_rex = re.compile(SENT_PTRN)
-    content = open(MFCNS_LOGFILE).readlines()
+    content = open(MFCNS_LOGFILE, 'rb').readlines()
 
     log = []
     statsbyname = {}
     total = 0
     for line in content:
-        result = sent_rex.match(line)
+        result = sent_rex.match(line.decode('ascii', 'ignore'))
         if result == None:
             continue
         total += 1
         logentry = result.group('date').replace('  ', ' '), \
             result.group('name'), result.group('addr')
-        if statsbyname.has_key(logentry[2]):
+        if logentry[2] in statsbyname:
             statsbyname[logentry[2]] += 1
         else:
             statsbyname[logentry[2]] = 1
         log.append(logentry)
 
-    print 'MFC Notification Service Statistics'
-    print '-----------------------------------\n'
-    print 'Period: %s - %s' % (log[0][0], log[-1][0])
-    print 'Total number of notifications sent: %d' % total
+    print('MFC Notification Service Statistics')
+    print('-----------------------------------\n')
+    print('Period: %s - %s' % (log[0][0], log[-1][0]))
+    print('Total number of notifications sent: %d' % total)
 
     if total == 0:
         sys.exit(0)
 
-    print '\n%s\t%s\t%s'   % ('Committer', 'MFCs', '% total')
-    print '%s\t%s\t%s\n' % ('---------', '----', '-------')
+    print('\n%s\t%s\t%s'   % ('Committer', 'MFCs', '% total'))
+    print('%s\t%s\t%s\n' % ('---------', '----', '-------'))
 
     while len(statsbyname) != 0:
         handle, number = locatemax(statsbyname)
@@ -72,7 +72,7 @@ def main():
             tab = '\t'
         else:
             tab = '\t\t'
-        print '%s%s%4d\t%7.2f' % (handle, tab, number, 100.0 * number / total)
+        print('%s%s%4d\t%7.2f' % (handle, tab, number, 100.0 * number / total))
         del statsbyname[handle]
 
 if __name__ == '__main__':
