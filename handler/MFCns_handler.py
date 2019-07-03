@@ -14,7 +14,7 @@
 #
 
 import atexit, os, re, time, errno, types, socket
-from email import message_from_file, policy
+from email import policy, message_from_bytes
 from email.utils import parsedate, parseaddr
 from subprocess import Popen, PIPE
 from pty import STDOUT_FILENO, STDERR_FILENO
@@ -124,8 +124,9 @@ def main():
 
         lprintf('Processing "%s"...', filename)
 
-        fdes = open(filename, 'r', encoding = 'utf-8')
-        message = message_from_file(fdes, policy = policy.default)
+        fdes = open(filename, 'rb')
+        fcon = fdes.read()
+        message = message_from_bytes(fcon, policy = policy.default)
         fdes.close()
 
         date = list(parsedate(message['Date']))
@@ -187,8 +188,9 @@ def main():
 
             lprintf('Processing "%s"...', filename)
 
-            fdes = open(filename, 'r', encoding = 'utf-8')
-            message = message_from_file(fdes, policy = policy.default)
+            fdes = open(filename, 'rb')
+            fcon = fdes.read()
+            message = message_from_bytes(fcon, policy = policy.default)
             fdes.close()
             to = parseaddr(message['From'])
             subject = message['Subject']
