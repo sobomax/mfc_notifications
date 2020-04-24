@@ -49,7 +49,7 @@ def sendnote(to, subject, branch, content):
         ('From: MFC Notification Service <mfc-notifications@FreeBSD.org>',    \
          'To: %s <%s>' % to,                            \
          'Subject: Pending MFC Reminder [%s]' % subject,            \
-         'X-FreeBSD-CVS-Branch: %s' % branch, \
+         'X-FreeBSD-Branch: %s' % branch, \
          '',                                    \
          'Dear %s,' % to[0],                            \
          '',                                    \
