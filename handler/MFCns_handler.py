@@ -23,7 +23,7 @@ def isstr(obj):
     try:
         return (isinstance(obj, basestring))
     except NameError:
-        return (isinstance(obj, str))
+        return (isinstance(obj, str) or isinstance(obj, bytes))
 
 MFCNS_ROOT = '/home/sobomax/MFCns'
 MAILCMD = '/usr/sbin/sendmail'
@@ -94,6 +94,8 @@ def lprintf(fmt, args = ''):
             args = []
     elif isinstance(args, tuple):
         args = list(args)
+    elif isinstance(args, list):
+        pass
     elif type(args) in (types.IntType, types.LongType, types.FloatType):
         args = [args]
     args.insert(0, stime())
@@ -211,7 +213,10 @@ def main():
                 i += 1
 
             sendnote(to, subject, branch, content)
-            lprintf('MFC notification sent to "%s" <%s>', to)
+            strname = '%s' % (to[0],)
+            stremail = '%s' % (to[1],)
+            strto = [x.encode(encoding = 'ascii', errors = 'replace') for x in (strname, stremail)]
+            lprintf('MFC notification sent to "%s" <%s>', strto)
             os.unlink(filename)
             do_sleep = 1
 
