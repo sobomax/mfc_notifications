@@ -196,7 +196,10 @@ def main():
             subject = message['Subject']
             branch = message.get('X-FreeBSD-CVS-Branch', None)
             if branch == None:
-                branch = message['X-SVN-Group']
+                branch = message.get('X-SVN-Group', None)
+            if branch == None:
+                 branch = message['X-Git-Refname]
+                 branch = branch.rsplit('/', 1)[1]
             content = message.get_body().get_content().splitlines(keepends = True)
 
             i = 0

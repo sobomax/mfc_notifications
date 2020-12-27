@@ -30,7 +30,7 @@
 #define MFCNS_SPOOL	MFCNS_ROOT "/spool"
 
 #define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@repo\\.freebsd\\.org)>$"
-#define BRNCH_PTRN	"^X-SVN-Group: ([a-z0-9-]+)$"
+#define BRNCH_PTRN	"^X-Git-Refname: refs/heads/([a-z0-9-]+)$"
 #define SENDER_PTRN	"^Sender: (.*)$"
 #define MFC_PTRN	"^  [ \t]*MFC[ \t]+([Aa]fter|[Ii]n):[ \t]*([0-9]+)[ \t]*(days?|weeks?|months?)?[ \t]*$"
 
@@ -101,7 +101,7 @@ main()
 	    }
 	    if (branch == NULL && regexec(&brnch_rex, line, 2, matches, 0) == 0) {
 		branch = strdup(get_matched_str(line, matches, 1));
-		if (strcasecmp(branch, "HEAD") != 0)
+		if (strcasecmp(branch, "refs/heads/main") != 0)
 		    goto notmatched;
 	    }
 	    if (sender == NULL && regexec(&sender_rex, line, 2, matches, 0) == 0) {
