@@ -200,7 +200,7 @@ def main():
             if branch == None:
                 branch = message.get('X-SVN-Group', None)
             if branch == None:
-                 branch = message['X-Git-Refname]
+                 branch = message['X-Git-Refname']
                  branch = branch.rsplit('/', 1)[1]
             content = message.get_body().get_content().splitlines(keepends = True)
 
