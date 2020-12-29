@@ -101,7 +101,7 @@ main()
 	    }
 	    if (branch == NULL && regexec(&brnch_rex, line, 2, matches, 0) == 0) {
 		branch = strdup(get_matched_str(line, matches, 1));
-		if (strcasecmp(branch, "refs/heads/main") != 0)
+		if (strcasecmp(branch, "main") != 0)
 		    goto notmatched;
 	    }
 	    if (sender == NULL && regexec(&sender_rex, line, 2, matches, 0) == 0) {
