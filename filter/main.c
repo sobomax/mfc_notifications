@@ -29,7 +29,7 @@
 #define MFCNS_TMP	MFCNS_ROOT "/tmp"
 #define MFCNS_SPOOL	MFCNS_ROOT "/spool"
 
-#define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@repo\\.freebsd\\.org)>$"
+#define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@gitrepo\\.freebsd\\.org)>$"
 #define BRNCH_PTRN	"^X-Git-Refname: refs/heads/([a-z0-9-]+)$"
 #define SENDER_PTRN	"^Sender: (.*)$"
 #define MFC_PTRN	"^  [ \t]*MFC[ \t]+([Aa]fter|[Ii]n):[ \t]*([0-9]+)[ \t]*(days?|weeks?|months?)?[ \t]*$"
