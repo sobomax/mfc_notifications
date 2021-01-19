@@ -37,7 +37,7 @@ MFCNS_TMP = os.path.join(MFCNS_ROOT, 'tmp')
 MFCNS_SPOOL = os.path.join(MFCNS_ROOT, 'spool')
 MFCNS_QUEUE = os.path.join(MFCNS_ROOT, 'queue')
 MFCNS_LOGFILE = os.path.join(MFCNS_ROOT, 'log/MFCns.log')
-MFC_PTRN = '^  [ \t]*MFC[ \t]+([Aa]fter|[Ii]n):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?|months?)?[ \t]*$'
+MFC_PTRN = '^  [ \t]*MFC(-|\s+)([Aa]fter|[Ii]n):[ \t]*(?P<ndays>[0-9]+)[ \t]*(?P<measr>days?|weeks?|months?)?[ \t]*$'
 MFC_TRAL = '^To Unsubscribe: send mail to majordomo@FreeBSD\\.org'
 SECSADAY = 24*60*60
 
