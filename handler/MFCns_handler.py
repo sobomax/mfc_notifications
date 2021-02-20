@@ -49,7 +49,7 @@ def sendnote(to, subject, branch, content):
         ('From: MFC Notification Service <mfc-notifications@FreeBSD.org>',    \
          'To: %s <%s>' % to,                            \
          'Subject: Pending MFC Reminder [%s]' % subject,            \
-         'X-FreeBSD-CVS-Branch: %s' % branch, \
+         'X-FreeBSD-Branch: %s' % branch, \
          '',                                    \
          'Dear %s,' % to[0],                            \
          '',                                    \
@@ -67,7 +67,8 @@ def sendnote(to, subject, branch, content):
          'believe that you received this message due to an error.',        \
          'P.P.S. Source code for this service is available at:',    \
          'https://github.com/sobomax/mfc_notifications',        \
-         'Have a feature in mind? Pull requests are always very welcome!',
+         'Have a feature in mind? Pull requests are always very welcome!',  \
+         'P.P.P.S. https://mfc.kernelnomicon.org is your friend!',
          '')]
     template.extend(content)
     template = [x.encode('utf-8') for x in template]
