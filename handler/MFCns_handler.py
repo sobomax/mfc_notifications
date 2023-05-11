@@ -68,7 +68,7 @@ def sendnote(to, subject, branch, content):
          'P.P.S. Source code for this service is available at:',    \
          'https://github.com/sobomax/mfc_notifications',        \
          'Have a feature in mind? Pull requests are always very welcome!',  \
-         'P.P.P.S. https://mfc.kernelnomicon.org is your friend!',
+         'P.P.P.S. https://mfc.FreeBSD.org is your friend!',
          '')]
     template.extend(content)
     template = [x.encode('utf-8') for x in template]
