@@ -32,7 +32,7 @@
 #define MID_PTRN	"^Message-Id: <([a-zA-Z0-9.]+@gitrepo\\.freebsd\\.org)>$"
 #define BRNCH_PTRN	"^X-Git-Refname: refs/heads/([a-z0-9-]+)$"
 #define SENDER_PTRN	"^Sender: (.*)$"
-#define MFC_PTRN	"^  [ \t]*MFC[ \t]+([Aa]fter|[Ii]n):[ \t]*([0-9]+)[ \t]*(days?|weeks?|months?)?[ \t]*$"
+#define MFC_PTRN	"^  [ \t]*MFC[ \t-]+([Aa]fter|[Ii]n):[ \t]*([0-9]+)[ \t]*(days?|weeks?|months?)?[ \t]*$"
 
 int	safe_regcomp(regex_t *, const char *, int);
 char	*get_matched_str(char *, regmatch_t [], int);
